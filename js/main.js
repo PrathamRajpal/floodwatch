@@ -3,7 +3,10 @@ async function getGaugeData() {
     const response = await fetch(url);
     const data = await response.json();
 
-    console.log(data);
+    const siteName = data.value.timeSeries[0].sourceInfo.siteName;
+    const height = parseFloat(data.value.timeSeries[0].values[0].value[0].value);
+
+    console.log(siteName, height);
 }
 
 getGaugeData();
