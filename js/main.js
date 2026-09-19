@@ -18,3 +18,17 @@ async function getGaugeData() {
     console.log(siteName, height);
 }
 getGaugeData();
+
+function getRiskStatus (currentHeight, thresholds) {
+    if(!thresholds) {
+        return { tier: "Unknown", message: "No data available." };
+    }
+
+    const riskStatus = threshlds.findLast(
+        threshold => currentHeight >= threshold.minHeight
+    );
+
+    return riskStatus
+    ? { tier: riskStaus.tier, message: riskStatus.messgae}
+    : { tier: "Unknown", message: "No risk status found." };
+}
