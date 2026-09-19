@@ -10,6 +10,17 @@ const gaugeThresholds = {
     { minHeight: 12.0, tier: "Major",   message: "Downstream, Libertyville's wastewater treatment plant property is threatened." },
     { minHeight: 12.5, tier: "Major",   message: "Downstream, structures at Mundelein's water reclamation facility are threatened." },
     { minHeight: 13.5, tier: "Major",   message: "Downstream, structures at Libertyville's wastewater treatment plant are threatened." }
+  ],
+  "05528100": [
+    { minHeight: 0,    tier: "Normal",  message: "No flooding impacts expected at this level." },
+    { minHeight: 8.0,  tier: "Watch",   message: "Low-lying section of the Des Plaines River Trail threatened near IL-60 (Townline Road)." },
+    { minHeight: 13.0, tier: "Warning", message: "Low-lying trails in Wright Woods Forest Preserve are inundated." },
+    { minHeight: 14.0, tier: "Warning", message: "Residences threatened east of the river just south of IL-22. Lincolnshire Drive threatened at Wiltshire Lane." },
+    { minHeight: 15.0, tier: "Warning", message: "Structures threatened along IL-22 just east of the river, and near US-45 and Deerfield Road. Trails inundated in Half-Day Forest Preserve." },
+    { minHeight: 16.0, tier: "Major",   message: "Numerous structures threatened along US-45 between IL-22 and Deerfield Road. IL-60 threatened near the river." },
+    { minHeight: 17.0, tier: "Major",   message: "IL-22 threatened just west of the river. US-45 threatened between IL-22 and Lake Cook Road." },
+    { minHeight: 18.0, tier: "Major",   message: "Widespread inundation of residences and businesses along US-45, between IL-22 and Lake Cook Road." },
+    { minHeight: 19.0, tier: "Major",   message: "Numerous commercial structures threatened near Milwaukee Avenue and Townline Road." }
   ]
 };
 async function getGaugeData() {
