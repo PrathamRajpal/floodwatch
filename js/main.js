@@ -13,15 +13,24 @@ const gaugeThresholds = {
   ]
 };
 async function getGaugeData() {
-    const url="https://waterservices.usgs.gov/nwis/iv/?sites=05528000&parameterCd=00065&siteStatus=all&format=json";
-    const response = await fetch(url);
-    const data = await response.json();
+  const url = "https://waterservices.usgs.gov/nwis/iv/?sites=05528000&parameterCd=00065&siteStatus=all&format=json";
+  const response = await fetch(url);
+  const data = await response.json();
 
-    const siteName = data.value.timeSeries[0].sourceInfo.siteName;
-    const height = parseFloat(data.value.timeSeries[0].values[0].value[0].value);
+  const siteName = data.value.timeSeries[0].sourceInfo.siteName;
+  const height = parseFloat(data.value.timeSeries[0].values[0].value[0].value);
+  const risk = getRiskStatus(height, gaugeThresholds["05528000"]);
 
-    console.log(siteName, height);
+  document.getElementById("gauge-cards").innerHTML = `
+    <div>
+      <h2>${siteName}</h2>
+      <p>Current height: ${height} ft</p>
+      <p>Status: ${risk.tier}</p>
+      <p>${risk.message}</p>
+    </div>
+  `;
 }
+
 getGaugeData();
 
 function getRiskStatus (currentHeight, thresholds) {
