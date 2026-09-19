@@ -24,11 +24,11 @@ function getRiskStatus (currentHeight, thresholds) {
         return { tier: "Unknown", message: "No data available." };
     }
 
-    const riskStatus = threshlds.findLast(
+    const riskStatus = thresholds.findLast(
         threshold => currentHeight >= threshold.minHeight
     );
 
     return riskStatus
-    ? { tier: riskStaus.tier, message: riskStatus.messgae}
+    ? { tier: riskStatus.tier, message: riskStatus.message}
     : { tier: "Unknown", message: "No risk status found." };
 }
