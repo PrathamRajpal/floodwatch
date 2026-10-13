@@ -48,21 +48,12 @@ async function getGaugeData() {
 }
 
 getGaugeData();
-  document.getElementById("gauge-cards").innerHTML = `
-    <div>
-      <h2>${siteName[0]}</h2>
-      <p>Current height: ${height[0]} ft</p>
-      <p>Status: ${risk1.tier}</p>
-      <p>${risk1.message}</p>
-      <h2>${siteName[1]}</h2>
-      <p>Current height: ${height[1]} ft</p>
-      <p>Status: ${risk2.tier}</p>
-      <p>${risk2.message}</p>
-    </div>
-  `;
+    document.getElementById("gauge-cards").innerHTML = cardsHTML.join("");
 }
 
 getGaugeData();
+
+function getRiskStatus (currentHeight, thresholds) {
 
 function getRiskStatus (currentHeight, thresholds) {
     if(!thresholds) {
