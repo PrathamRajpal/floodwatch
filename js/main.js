@@ -28,16 +28,36 @@ async function getGaugeData() {
   const response = await fetch(url);
   const data = await response.json();
 
-  const siteName = data.value.timeSeries[0].sourceInfo.siteName;
-  const height = parseFloat(data.value.timeSeries[0].values[0].value[0].value);
-  const risk = getRiskStatus(height, gaugeThresholds["05528000"]);
+  const cardsHTML = data.value.timeSeries.map(entry => {
+    const siteId = entry.sourceInfo.siteCode[0].value;
+    const siteName = entry.sourceInfo.siteName;
+    const height = parseFloat(entry.values[0].value[0].value);
+    const risk = getRiskStatus(height, gaugeThresholds[siteId]);
 
+    return `
+      <div class="gauge-card">
+        <h2>${siteName}</h2>
+        <p>Current height: ${height} ft</p>
+        <p>Status: ${risk.tier}</p>
+        <p>${risk.message}</p>
+      </div>
+    `;
+  });
+
+  document.getElementById("gauge-cards").innerHTML = cardsHTML.join("");
+}
+
+getGaugeData();
   document.getElementById("gauge-cards").innerHTML = `
     <div>
-      <h2>${siteName}</h2>
-      <p>Current height: ${height} ft</p>
-      <p>Status: ${risk.tier}</p>
-      <p>${risk.message}</p>
+      <h2>${siteName[0]}</h2>
+      <p>Current height: ${height[0]} ft</p>
+      <p>Status: ${risk1.tier}</p>
+      <p>${risk1.message}</p>
+      <h2>${siteName[1]}</h2>
+      <p>Current height: ${height[1]} ft</p>
+      <p>Status: ${risk2.tier}</p>
+      <p>${risk2.message}</p>
     </div>
   `;
 }
