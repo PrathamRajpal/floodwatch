@@ -1,4 +1,65 @@
 body {
   font-family: system-ui, sans-serif;
-  margin: 2rem;
+  margin: 0;
+  padding: 1rem;
+  background: #f4f6f8;
+  color: #1a1a1a;
 }
+
+h1 {
+  margin-top: 0;
+}
+
+#gauge-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.gauge-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border-left: 8px solid #888;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.gauge-card h2 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+
+.height {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.updated {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.tier-normal  { border-left-color: #2e7d32; }
+.tier-normal .badge  { background: #2e7d32; }
+
+.tier-watch   { border-left-color: #f9a825; }
+.tier-watch .badge   { background: #b07800; }
+
+.tier-warning { border-left-color: #ef6c00; }
+.tier-warning .badge { background: #c45500; }
+
+.tier-major   { border-left-color: #c62828; }
+.tier-major .badge   { background: #c62828; }
+
+.tier-unknown { border-left-color: #757575; }
+.tier-unknown .badge { background: #757575; }
