@@ -48,12 +48,6 @@ async function getGaugeData() {
 }
 
 getGaugeData();
-    document.getElementById("gauge-cards").innerHTML = cardsHTML.join("");
-}
-
-getGaugeData();
-
-function getRiskStatus (currentHeight, thresholds) {
 
 function getRiskStatus (currentHeight, thresholds) {
     if(!thresholds) {
