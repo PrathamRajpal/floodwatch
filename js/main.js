@@ -31,15 +31,20 @@ async function getGaugeData() {
   const cardsHTML = data.value.timeSeries.map(entry => {
     const siteId = entry.sourceInfo.siteCode[0].value;
     const siteName = entry.sourceInfo.siteName;
-    const height = parseFloat(entry.values[0].value[0].value);
+    const reading = entry.values[0].value[0];
+    const height = parseFloat(reading.value);
+    const updated = new Date(reading.dateTime).toLocaleString([], {
+      month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
+    });
     const risk = getRiskStatus(height, gaugeThresholds[siteId]);
 
     return `
-      <div class="gauge-card">
+      <div class="gauge-card tier-${risk.tier.toLowerCase()}">
         <h2>${siteName}</h2>
-        <p>Current height: ${height} ft</p>
-        <p>Status: ${risk.tier}</p>
+        <span class="badge">${risk.tier}</span>
+        <p class="height">${height} ft</p>
         <p>${risk.message}</p>
+        <p class="updated">Updated ${updated}</p>
       </div>
     `;
   });
