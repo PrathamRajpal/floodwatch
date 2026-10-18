@@ -31,13 +31,14 @@ async function loadGaugeDetail() {
     const latest = readings[readings.length - 1];
     const risk = getRiskStatus(latest.height, gaugeThresholds[siteId]);
 
-    document.getElementById("gauge-title").textContent = siteName;
+        document.getElementById("gauge-title").textContent = siteName;
     document.getElementById("gauge-summary").innerHTML = `
       <div class="gauge-card tier-${risk.tier.toLowerCase()}">
         <span class="badge">${risk.tier}</span>
         <p class="height">${latest.height} ft</p>
         <p>${risk.message}</p>
       </div>
+    `;
 
     new Chart(document.getElementById("history-chart"), {
       type: "line",
@@ -62,9 +63,6 @@ async function loadGaugeDetail() {
         }
       }
     });
-    `;
-
-    console.log(readings.length, readings[0], latest);
   } catch (error) {
     console.error("Failed to load gauge detail:", error);
     statusEl.textContent = "Couldn't load this gauge's history from USGS just now.";
