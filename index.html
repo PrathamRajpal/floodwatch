@@ -8,9 +8,29 @@
 </head>
 <body>
   <h1>FloodWatch</h1>
+
+  <div class="location-bar">
+    <label for="town-select">Show gauges near:</label>
+    <select id="town-select">
+      <option value="default">Our verified Lake County gauges</option>
+      <option value="lincolnshire">Lincolnshire, IL</option>
+      <option value="buffalo-grove">Buffalo Grove, IL</option>
+      <option value="vernon-hills">Vernon Hills, IL</option>
+      <option value="gurnee">Gurnee, IL</option>
+    </select>
+    <button id="locate-btn" type="button">Use my location</button>
+  </div>
+  <p id="location-status"></p>
   <p id="status"></p>
   <div id="gauge-cards"></div>
+
+  <p class="disclaimer">
+    Informational only. Data: National Weather Service and USGS. Your location is used only to look up
+    nearby gauges and is not stored. In an emergency call 911 and follow official warnings.
+  </p>
+
   <script src="js/thresholds.js"></script>
+  <script src="js/nearby.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
 </html>

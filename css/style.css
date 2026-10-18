@@ -103,3 +103,49 @@ h1 {
   font-size: 0.8rem;
   margin: 0.5rem 0 0;
 }
+.location-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.location-bar select,
+.location-bar button {
+  font-size: 1rem;
+  padding: 0.4rem 0.6rem;
+}
+
+#location-status {
+  font-size: 0.9rem;
+  color: #444;
+  margin: 0.25rem 0;
+}
+
+.distance {
+  font-size: 0.85rem;
+  color: #555;
+  margin: 0.25rem 0;
+}
+
+.source {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0.5rem 0 0;
+}
+
+.source.verified {
+  color: #2e7d32;
+}
+
+.no-impacts {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: #555;
+  margin-top: 1.5rem;
+}
