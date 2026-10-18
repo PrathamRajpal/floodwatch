@@ -38,6 +38,30 @@ async function loadGaugeDetail() {
         <p class="height">${latest.height} ft</p>
         <p>${risk.message}</p>
       </div>
+
+    new Chart(document.getElementById("history-chart"), {
+      type: "line",
+      data: {
+        labels: readings.map(r =>
+          r.time.toLocaleString([], { month: "short", day: "numeric", hour: "numeric" })
+        ),
+        datasets: [{
+          label: "Gauge height (ft)",
+          data: readings.map(r => r.height),
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { maxTicksLimit: 8 } },
+          y: { title: { display: true, text: "Feet" } }
+        }
+      }
+    });
     `;
 
     console.log(readings.length, readings[0], latest);
