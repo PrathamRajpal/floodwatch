@@ -1,5 +1,17 @@
+function demoHeight(gauge, demoTier) {
+  if (!gauge || !demoTier) {
+    return null;
+  }
+
+  const keyFor = { watch: "action", warning: "minor", major: "major" };
+  const key = keyFor[demoTier.toLowerCase()];
+
+  return gauge.categories[key] || null;
+}
+
 async function getGaugeData() {
   const statusEl = document.getElementById("status");
+  const demoTier = new URLSearchParams(window.location.search).get("demo");
 
   try {
     const siteList = Object.keys(gaugeThresholds).join(",");
@@ -14,7 +26,8 @@ async function getGaugeData() {
       const siteId = entry.sourceInfo.siteCode[0].value;
       const siteName = entry.sourceInfo.siteName;
       const reading = entry.values[0].value[0];
-      const height = parseFloat(reading.value);
+      const simulated = demoHeight(gaugeThresholds[siteId], demoTier);
+      const height = simulated !== null ? simulated : parseFloat(reading.value);
       const updated = new Date(reading.dateTime).toLocaleString([], {
         month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
       });
@@ -35,6 +48,7 @@ async function getGaugeData() {
         <div class="gauge-card tier-${risk.tier.toLowerCase()}">
           <h2>${siteName}</h2>
           <span class="badge">${risk.tier}</span>
+          ${simulated !== null ? '<p class="demo-flag">SIMULATED DATA (demo mode)</p>' : ""}
           <p class="height">${height} ft</p>
           ${affectedHTML}
           ${nextHTML}

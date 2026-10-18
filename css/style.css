@@ -96,3 +96,10 @@ h1 {
   color: #444;
   margin: 0.75rem 0 0;
 }
+
+.demo-flag {
+  color: #b00020;
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0;
+}
