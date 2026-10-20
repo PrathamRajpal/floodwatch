@@ -9,6 +9,19 @@
 <body>
   <h1>FloodWatch</h1>
 
+  <div id="alert-panel"></div>
+
+  <section class="roads-panel" id="roads-panel">
+    <h2>Your roads</h2>
+    <div id="roads-status"></div>
+    <details class="chooser">
+      <summary>Choose the roads you drive</summary>
+      <div id="roads-chooser"></div>
+    </details>
+    <p class="caption">This is not a road-closure report. The National Weather Service lists the heights at which
+      river flooding threatens a road. For actual closures, check your village or county.</p>
+  </section>
+
   <div class="location-bar">
     <label for="town-select">Show gauges near:</label>
     <select id="town-select">
@@ -19,17 +32,23 @@
       <option value="gurnee">Gurnee, IL</option>
     </select>
     <button id="locate-btn" type="button">Use my location</button>
+    <button id="notify-btn" type="button" hidden>Turn on browser alerts</button>
   </div>
+  <p id="notify-note"></p>
   <p id="location-status"></p>
   <p id="status"></p>
   <div id="gauge-cards"></div>
 
   <p class="disclaimer">
-    Informational only. Data: National Weather Service and USGS. Your location is used only to look up
-    nearby gauges and is not stored. In an emergency call 911 and follow official warnings.
+    Informational only. Data: National Weather Service and USGS. Your chosen roads and last visit are saved only
+    in your own browser. Your location is used only to look up nearby gauges and is not stored.
+    In an emergency call 911 and follow official warnings.
   </p>
 
   <script src="js/thresholds.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/roads.js"></script>
+  <script src="js/alerts.js"></script>
   <script src="js/nearby.js"></script>
   <script src="js/dashboard.js"></script>
 </body>

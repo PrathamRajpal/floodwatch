@@ -149,3 +149,39 @@ h1 {
   color: #555;
   margin-top: 1.5rem;
 }
+
+[hidden] { display: none !important; }
+
+.caption { font-size: 0.85rem; color: #5d6670; }
+.muted { color: #5d6670; font-size: 0.92rem; }
+
+/* alerts */
+.alert-box { margin: 1rem 0; padding: 0.9rem 1rem; border: 2px solid #1d1b18; background: #fff8e8; }
+.alert-title { margin: 0 0 0.25rem; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.alert-box ul { margin: 0 0 0.7rem; padding-left: 1.1rem; }
+.alert-box li.worse { color: #a4202f; font-weight: 600; }
+.alert-box li.better { color: #3f6b4f; }
+.alert-safety { margin: 0.5rem 0; padding: 0.5rem 0.7rem; background: #1d1b18; color: #fff; }
+.alert-box button, #notify-btn { font: inherit; min-height: 44px; padding: 0 0.9rem; font-weight: 600; cursor: pointer; }
+#notify-note { font-size: 0.85rem; color: #5d6670; margin: 0.3rem 0; }
+
+/* your roads */
+.roads-panel { margin: 1rem 0; }
+.road { padding: 0.7rem 0.8rem; border-left: 5px solid #8c8576; border-bottom: 1px solid #d8d2c4; }
+.road-threatened { border-left-color: #a4202f; background: rgba(164, 32, 47, 0.07); }
+.road-close { border-left-color: #1f4e79; background: rgba(31, 78, 121, 0.07); }
+.road-clear { border-left-color: #5d7f6b; }
+.road-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; }
+.road-tag { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #5d6670; }
+.road-threatened .road-tag { color: #a4202f; }
+.road-close .road-tag { color: #1f4e79; }
+.road-note { margin: 0.2rem 0 0; font-size: 0.88rem; }
+.chooser { margin-top: 0.8rem; }
+.chooser summary { font-weight: 600; min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+.choice { display: flex; align-items: center; gap: 0.6rem; min-height: 44px; font-size: 0.95rem; }
+.choice input { width: 20px; height: 20px; }
+
+/* trend, rising fast, estimate */
+.trend-line { margin: 0.2rem 0; font-size: 0.92rem; }
+.fast { margin-left: 0.4rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; background: #a4202f; padding: 0.1rem 0.45rem; border-radius: 2px; white-space: nowrap; }
+.eta { margin: 0.4rem 0; padding: 0.5rem 0.7rem; border-left: 4px solid #a4202f; background: rgba(164, 32, 47, 0.07); font-size: 0.88rem; }
