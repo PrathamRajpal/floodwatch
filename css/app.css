@@ -1,0 +1,239 @@
+/* FloodWatch layout and look. Loaded after style.css and overrides it where the two disagree.
+   Sections: 1 fonts and colours, 2 page layout, 3 buttons, 4 sidebar, 5 hero and tabs, 6 panels, 7 alerts and roads, 8 phone. */
+
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:wght@400;600;700&display=swap");
+
+/* 1. Fonts and colours */
+:root {
+  --page: #F6F4EF;   /* warm paper instead of cool grey */
+  --card: #FFFEFB;
+  --ink: #1A2430;
+  --muted: #5F6B76;
+  --line: #E2DDD2;
+  --edge: #C8C1B3;
+  --link: #1F5FAD;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --shadow: none;     /* thin borders instead of soft shadows */
+  --r-btn: 8px;       /* buttons and the town menu */
+  --r-card: 8px;      /* panels and list rows */
+  --r-hero: 6px;
+}
+
+/* One set of colours per tier. Anything inside an element with data-tier can use these. */
+[data-tier="Normal"]  { --tint: #DCEAF6; --tier-ink: #0D3559; --dot: #2F7BD0; }
+[data-tier="Watch"]   { --tint: #FBEACB; --tier-ink: #5E3800; --dot: #C77A0E; }
+[data-tier="Warning"] { --tint: #F8D8C1; --tier-ink: #6A2604; --dot: #C4520F; }
+[data-tier="Major"]   { --tint: #F4CDD2; --tier-ink: #6F0E1D; --dot: #B3263A; }
+[data-tier="Unknown"] { --tint: #E6EBF0; --tier-ink: #3B4C5C; --dot: #93A3B2; }
+
+body {
+  font-family: Manrope, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--page);
+  color: var(--ink);
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+a { color: var(--link); }
+:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+.muted, .caption, .disclaimer, #notify-note, #location-status { color: var(--muted); }
+
+.skip-link { position: absolute; left: 12px; top: -60px; z-index: 10; padding: 10px 14px; background: var(--ink); color: #fff; border-radius: var(--r-btn); }
+.skip-link:focus { top: 12px; }
+
+/* 2. Page layout: a left column, the gauge in the middle of the page, small print under the list */
+.app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-areas: "top main" "bottom main";
+  grid-template-rows: auto 1fr;
+  gap: 20px 32px;
+}
+.side-top { grid-area: top; min-width: 0; }
+.main { grid-area: main; min-width: 0; }
+.side-bottom { grid-area: bottom; min-width: 0; align-self: end; }
+
+.brand h1 { display: flex; align-items: center; margin: 0; font-family: var(--serif); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; }
+/* a tiny staff gauge, the same idea as the tubes in the list */
+.brand h1::before { content: ""; width: 9px; height: 26px; margin-right: 10px; border: 2px solid var(--ink); border-radius: 5px;
+  background: linear-gradient(to top, #2463AE 0 55%, transparent 55%); }
+.brand p { margin: 2px 0 0; color: var(--muted); font-weight: 600; font-size: 0.9rem; }
+
+.summary { margin: 20px 0 4px; font-family: var(--serif); font-size: 1.3rem; font-weight: 600; line-height: 1.3; }
+.closest { margin: 0 0 16px; color: var(--muted); font-size: 0.9rem; }
+.closest:empty { display: none; }
+
+#status { margin: 0 0 12px; padding: 0; color: #6A3B00; font-weight: 600; }
+#status:empty { display: none; }
+body.stale #gauge-view { opacity: 0.7; }
+
+/* 3. Buttons and the town menu: rounded rectangles, not pills */
+button, select {
+  font: inherit;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--edge);
+  border-radius: var(--r-btn);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+button:hover, select:hover { border-color: #9FB0C0; }
+button:active { transform: translateY(1px); }
+
+.location-bar { display: grid; gap: 8px; margin: 0 0 6px; }
+.location-bar label { font-size: 0.88rem; font-weight: 600; color: var(--muted); }
+.location-bar select { width: 100%; }
+#locate-btn { background: var(--link); border-color: var(--link); color: #fff; }
+#locate-btn:hover { background: #194E91; border-color: #194E91; }
+#location-status { margin: 4px 0 12px; font-size: 0.88rem; }
+#location-status:empty { display: none; }
+
+.back-btn { margin: 0 0 14px; }
+
+.sim-btn { width: 100%; border-style: dashed; color: var(--muted); }
+.sim-btn[aria-pressed="true"] { border-style: solid; border-color: #C77A0E; background: #FBEACB; color: #5E3800; }
+
+.notify-box { margin: 0 0 12px; }
+.notify-box button { width: 100%; }
+#notify-note { margin: 6px 0 0; font-size: 0.85rem; }
+
+/* 4. Sidebar: the gauge list */
+.roads-tile {
+  width: 100%; margin: 6px 0 18px; padding: 10px 14px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left;
+}
+.roads-tile[aria-current="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.roads-tile-title { font-size: 0.85rem; font-weight: 600; opacity: 0.75; }
+.roads-tile-summary { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.dot { flex: none; display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--dot, #93A3B2); }
+.road-dot-clear { background: #2F7BD0; }
+.road-dot-close { background: #C77A0E; }
+.road-dot-threatened { background: #B3263A; }
+.road-dot-none { background: #93A3B2; }
+
+.gauge-list { display: grid; border-top: 1px solid var(--ink); }
+.gauge-row {
+  display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 14px; align-items: center;
+  min-height: 66px; padding: 10px 12px 10px 10px;
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid var(--line); border-left: 4px solid transparent;
+}
+.gauge-row:hover { background: rgba(26, 36, 48, 0.04); }
+.gauge-row[aria-current="true"] { background: var(--tint); color: var(--tier-ink); border-left-color: var(--dot); }
+.tube { position: relative; width: 10px; height: 44px; border: 1px solid var(--edge); border-radius: 5px; background: var(--card); overflow: hidden; }
+.gauge-row[aria-current="true"] .tube { border-color: var(--tier-ink); }
+.tube-fill { position: absolute; left: 0; right: 0; bottom: 0; }
+.row-text { display: grid; min-width: 0; }
+.row-place { font-family: var(--serif); font-size: 1.08rem; font-weight: 600; overflow-wrap: anywhere; }
+.row-sub { font-size: 0.8rem; color: var(--muted); }
+.gauge-row[aria-current="true"] .row-sub { color: inherit; opacity: 0.8; }
+.row-level { display: grid; justify-items: end; gap: 1px; text-align: right; }
+.row-height { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.row-height small { font-size: 0.7em; font-weight: 600; opacity: 0.7; }
+.row-tier { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 700; }
+.fast-tag { padding: 1px 6px; border-radius: 3px; background: #8A1426; color: #fff; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.06em; }
+
+.side-bottom .disclaimer { margin: 14px 0 0; font-size: 0.78rem; line-height: 1.5; }
+
+/* 5. The gauge: hero and tabs */
+.hero {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px 32px;
+  background: var(--tint); color: var(--tier-ink);
+  border-radius: var(--r-hero); border-left: 10px solid var(--dot); padding: 24px 28px;
+}
+.hero-main { flex: 1 1 300px; min-width: 0; }
+.hero h2 { margin: 0; font-family: var(--serif); font-size: clamp(2rem, 4.4vw, 2.9rem); font-weight: 700; line-height: 1.05; }
+.hero h2:focus { outline: none; }
+.hero-full { margin: 4px 0 14px; opacity: 0.85; }
+.hero-status { margin: 0; font-weight: 800; font-size: 1.05rem; }
+.hero-gap { margin: 2px 0 0; }
+.hero-meta { margin: 14px 0 0; font-size: 0.82rem; font-weight: 600; }
+.hero-meta a { color: inherit; }
+.hero-height { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(3.6rem, 10vw, 6.2rem); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.hero-height span { font-size: 0.3em; font-weight: 500; letter-spacing: 0; opacity: 0.75; }
+.pill-fast { margin-left: 10px; padding: 2px 9px; border-radius: 3px; background: #8A1426; color: #fff; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+.hero-eta { margin: 14px 0 0; padding: 10px 14px; border-radius: 4px; background: rgba(255, 254, 251, 0.65); font-size: 0.88rem; }
+.demo-flag { font-weight: 800; letter-spacing: 0.02em; }
+
+.demo-banner { margin: 0 0 12px; padding: 10px 14px; border-radius: 4px; background: #FBEACB; color: #5E3800; font-weight: 700; font-size: 0.9rem; }
+
+.tabs { display: flex; gap: 22px; margin: 20px 0 18px; border-bottom: 1px solid var(--line); }
+.tabs button { min-height: 44px; padding: 0 2px; border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: transparent; color: var(--muted); font-weight: 700; white-space: nowrap; }
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+#panel-now { margin-top: 18px; }
+
+/* 6. Cards inside the panels */
+.panel-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px 20px; }
+.panel-card.spaced { margin-top: 16px; }
+.panel-card h3 { margin: 0 0 10px; font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--ink); }
+.panel-card p { margin: 4px 0; }
+.now-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
+.river { margin: 0; }
+.river svg { display: block; width: 100%; height: auto; border-radius: 4px; }
+.river figcaption { margin-top: 8px; font-size: 0.75rem; color: var(--muted); }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+.stats p { margin: 0; }
+.stat-label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+.stat-value { font-family: var(--serif); font-size: 1.6rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat-sub { font-size: 0.82rem; color: var(--muted); }
+
+.impact-rows { list-style: none; margin: 0; padding: 0; }
+.impact-rows li { display: flex; gap: 14px; padding: 10px 6px; border-top: 1px solid var(--line); }
+.impact-rows li:first-child { border-top: 0; }
+.impact-rows .stage { flex: 0 0 4.4rem; font-weight: 800; color: #A84210; }
+.ladder li.reached { background: #FBF0E2; }
+.ladder li.level { font-weight: 800; }
+.ladder li.now { background: var(--link); color: #fff; border-radius: 4px; font-weight: 800; }
+.ladder li.now .stage { color: #fff; }
+
+.chart-box { position: relative; height: 360px; margin: 0; padding: 0; background: transparent; border: 0; box-shadow: none; border-radius: 0; }
+
+/* 7. Alerts and Your roads */
+.alert-box { margin: 0 0 16px; padding: 14px 18px; background: #FFF4E5; border: 1.5px solid #E7B66A; border-radius: var(--r-card); color: #6A3B00; }
+.alert-title { margin: 0 0 4px; font-family: var(--serif); font-size: 1.05rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
+.alert-box ul { margin: 0 0 10px; padding-left: 1.1rem; }
+.alert-box li.worse { color: #8A1426; font-weight: 700; }
+.alert-box li.better { color: #1E6B3A; }
+.alert-safety { margin: 8px 0; padding: 10px 14px; background: var(--ink); color: #fff; border-radius: 4px; }
+
+.roads-panel { margin: 0; }
+.roads-panel h2 { margin: 0 0 12px; font-family: var(--serif); font-size: 1.9rem; font-weight: 700; }
+.road { margin-bottom: 8px; padding: 12px 16px; background: var(--card); border: 1px solid var(--line); border-left: 5px solid var(--edge); border-radius: 4px; }
+.road-threatened { border-left-color: #B3263A; background: #FCEDEF; }
+.road-close { border-left-color: #C77A0E; background: #FDF5E4; }
+.road-clear { border-left-color: #2F7BD0; }
+.road-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.road-tag { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+.road-threatened .road-tag { color: #8A1426; }
+.road-close .road-tag { color: #5E3800; }
+.road-note { margin: 4px 0 0; font-size: 0.88rem; }
+.chooser { margin-top: 16px; padding: 4px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); }
+.chooser summary { display: flex; align-items: center; min-height: 44px; font-weight: 700; cursor: pointer; }
+.choice { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 0.95rem; }
+.choice input { width: 20px; height: 20px; }
+#roads-status .demo-flag { margin: 0 0 8px; color: #8A5200; }
+
+/* 8. Phone and small tablet: one column, the gauge list becomes a row you swipe sideways */
+@media (max-width: 899px) {
+  .app { display: block; padding: 16px; }
+  .side-top { margin-bottom: 16px; }
+  .side-bottom { margin-top: 24px; }
+  .location-bar { grid-template-columns: 1fr; }
+  .gauge-list { display: flex; overflow-x: auto; gap: 8px; padding: 2px 2px 8px; border-top: 0; scroll-snap-type: x proximity; }
+  .gauge-row { flex: 0 0 min(230px, 72vw); scroll-snap-align: start; grid-template-columns: minmax(0, 1fr) auto;
+    background: var(--card); border: 1px solid var(--line); border-left: 4px solid transparent; border-radius: var(--r-card); }
+  .gauge-row[aria-current="true"] { background: var(--tint); border-color: var(--line); border-left-color: var(--dot); }
+  .tube { display: none; }
+  .now-grid { grid-template-columns: 1fr; }
+  .hero { padding: 20px; }
+  .chart-box { height: 280px; }
+  .tabs { display: flex; }
+  .tabs button { flex: 1; padding: 0 8px; }
+}
