@@ -5,51 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FloodWatch</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <h1>FloodWatch</h1>
+  <a class="skip-link" href="#main">Skip to the gauge</a>
 
-  <div id="alert-panel"></div>
+  <div class="app">
 
-  <section class="roads-panel" id="roads-panel">
-    <h2>Your roads</h2>
-    <div id="roads-status"></div>
-    <details class="chooser">
-      <summary>Choose the roads you drive</summary>
-      <div id="roads-chooser"></div>
-    </details>
-    <p class="caption">This is not a road-closure report. The National Weather Service lists the heights at which
-      river flooding threatens a road. For actual closures, check your village or county.</p>
-  </section>
+    <aside class="side-top" aria-label="All gauges">
+      <header class="brand">
+        <h1>FloodWatch</h1>
+        <p>Lake County, IL</p>
+      </header>
 
-  <div class="location-bar">
-    <label for="town-select">Show gauges near:</label>
-    <select id="town-select">
-      <option value="default">Our verified Lake County gauges</option>
-      <option value="lincolnshire">Lincolnshire, IL</option>
-      <option value="buffalo-grove">Buffalo Grove, IL</option>
-      <option value="vernon-hills">Vernon Hills, IL</option>
-      <option value="gurnee">Gurnee, IL</option>
-    </select>
-    <button id="locate-btn" type="button">Use my location</button>
-    <button id="notify-btn" type="button" hidden>Turn on browser alerts</button>
+      <p id="summary" class="summary" aria-live="polite">Loading readings...</p>
+      <p id="closest" class="closest"></p>
+
+      <div class="location-bar">
+        <label for="town-select">Show gauges near</label>
+        <select id="town-select">
+          <option value="default">Our verified Lake County gauges</option>
+          <option value="lincolnshire">Lincolnshire, IL</option>
+          <option value="buffalo-grove">Buffalo Grove, IL</option>
+          <option value="vernon-hills">Vernon Hills, IL</option>
+          <option value="gurnee">Gurnee, IL</option>
+        </select>
+        <button id="locate-btn" type="button">Use my location</button>
+      </div>
+      <p id="location-status"></p>
+
+      <button id="roads-tile" class="roads-tile" type="button" hidden>
+        <span class="roads-tile-title">Your roads</span>
+        <span class="roads-tile-summary" id="roads-summary"></span>
+      </button>
+
+      <nav id="gauge-list" class="gauge-list" aria-label="Gauges"></nav>
+    </aside>
+
+    <main class="main" id="main">
+      <div id="alert-panel"></div>
+      <p id="demo-banner" class="demo-banner" hidden>Simulated data (demo mode). These are not real readings.</p>
+      <p id="status"></p>
+
+      <div id="gauge-view"></div>
+
+      <div id="roads-view" hidden>
+        <button id="roads-back" class="back-btn" type="button">&larr; Back to gauges</button>
+        <section class="roads-panel" id="roads-panel">
+          <h2>Your roads</h2>
+          <div id="roads-status"></div>
+          <details class="chooser">
+            <summary>Choose the roads you drive</summary>
+            <div id="roads-chooser"></div>
+          </details>
+          <p class="caption">This is not a road-closure report. The National Weather Service lists the heights at which
+            river flooding threatens a road. For actual closures, check your village or county.</p>
+        </section>
+      </div>
+    </main>
+
+    <aside class="side-bottom">
+      <div id="notify-box" class="notify-box" hidden>
+        <button id="notify-btn" type="button" hidden>Turn on browser alerts</button>
+        <p id="notify-note"></p>
+      </div>
+      <button id="sim-btn" class="sim-btn" type="button" aria-pressed="false">Simulate a flood</button>
+      <p class="disclaimer">
+        Informational only. Data: National Weather Service and USGS. Your chosen roads and last visit are saved only
+        in your own browser. When you search by place or location, a rough area around it is sent to the National
+        Weather Service to find nearby gauges. We don't store it.
+        In an emergency call 911 and follow official warnings.
+      </p>
+    </aside>
+
   </div>
-  <p id="notify-note"></p>
-  <p id="location-status"></p>
-  <p id="status"></p>
-  <div id="gauge-cards"></div>
-
-  <p class="disclaimer">
-    Informational only. Data: National Weather Service and USGS. Your chosen roads and last visit are saved only
-    in your own browser. Your location is used only to look up nearby gauges and is not stored.
-    In an emergency call 911 and follow official warnings.
-  </p>
 
   <script src="js/thresholds.js"></script>
   <script src="js/helpers.js"></script>
   <script src="js/roads.js"></script>
   <script src="js/alerts.js"></script>
   <script src="js/nearby.js"></script>
+  <script src="js/crosssection.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/view.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
 </html>

@@ -1,3 +1,6 @@
+// Gets the readings, works out each gauge's status, and hands the results to the page.
+// The page itself is drawn by sidebar.js (the gauge list and summary) and view.js (the selected gauge).
+
 const TOWNS = {
   "lincolnshire":  { label: "Lincolnshire, IL",  lat: 42.19,  lon: -87.91 },
   "buffalo-grove": { label: "Buffalo Grove, IL", lat: 42.166, lon: -87.963 },
@@ -13,6 +16,7 @@ function verifiedGauges() {
 
 let currentGauges = verifiedGauges();
 let riverMode = true; // true for our own four gauges, false after a search by location
+let shownResults = []; // the results on screen right now
 
 function demoHeight(gauge, demoTier) {
   if (!gauge || !demoTier) {
@@ -58,6 +62,15 @@ function recentRate(readings) {
   return { perHour: (latest.height - earlier.height) / hours, hours };
 }
 
+// In demo mode, adding &rise=0.4 to the address pretends the river rises 0.4 ft per hour.
+function currentRate(readings, simulated) {
+  if (simulated === null) {
+    return recentRate(readings);
+  }
+  const demoRise = Number(new URLSearchParams(window.location.search).get("rise"));
+  return demoRise > 0 ? { perHour: demoRise, hours: 3 } : null;
+}
+
 function trendLine(rate) {
   const change = rate.perHour * rate.hours;
   const hours = Math.round(rate.hours);
@@ -88,92 +101,64 @@ function etaText(hours) {
   return whole === 1 ? "about 1 hour" : `about ${whole} hours`;
 }
 
-function buildCard(gauge, entry, demoTier) {
+// Everything we know about one gauge right now, as plain data. The page decides how to show it.
+function buildResult(gauge, entry, demoTier) {
   const name = niceName(entry ? entry.sourceInfo.siteName : (gauge.name || gauge.usgsId));
   const readings = readingsOf(entry);
   const latest = readings[readings.length - 1];
   const simulated = demoHeight(gauge, demoTier);
-
-  const distanceHTML = gauge.miles !== undefined
-    ? `<p class="distance">${gauge.miles.toFixed(1)} miles away</p>`
-    : "";
-  const sourceHTML = gauge.verified
-    ? `<p class="source verified">Thresholds checked by our team against NWS</p>`
-    : `<p class="source">NWS data, not independently checked by us</p>`;
+  const base = { id: gauge.usgsId, gauge, name, place: placeOf(name), miles: gauge.miles };
 
   if (simulated === null && !latest) {
-    return { id: gauge.usgsId, name, place: placeOf(name), tier: "Unknown", fast: false, html: `
-      <div class="gauge-card tier-unknown">
-        <h2>${clean(name)}</h2>
-        <span class="badge">No data</span>
-        ${distanceHTML}
-        <p>USGS is not reporting a recent reading for this gauge.</p>
-        ${sourceHTML}
-      </div>
-    ` };
+    return { ...base, tier: "Unknown", fast: false, gap: null, model: null };
   }
 
   const height = simulated !== null ? simulated : latest.height;
   const risk = getRiskStatus(height, gauge);
   const gap = risk.next ? risk.next.stage - height : null;
-
-  // How fast is it moving? In demo mode, adding &rise=0.4 pretends the river rises 0.4 ft per hour.
-  let rate = simulated !== null ? null : recentRate(readings);
-  const demoRise = Number(new URLSearchParams(window.location.search).get("rise"));
-  if (simulated !== null && demoRise > 0) {
-    rate = { perHour: demoRise, hours: 3 };
-  }
+  const rate = currentRate(readings, simulated);
   const fast = rate !== null && rate.perHour >= FAST_RISE_FT_PER_HOUR;
   const hours = hoursToNext(rate, gap);
 
-  const affectedHTML = risk.affected.length > 0
-    ? `<p class="impact-heading">Affected right now</p>
-       <ul class="impact-list">
-         ${[...risk.affected].reverse().map(i => `<li>${clean(i.statement)}</li>`).join("")}
-       </ul>`
-    : "";
+  return {
+    ...base, height, tier: risk.tier, fast, gap,
+    model: { readings, latest, simulated, height, risk, gap, rate, fast, hours }
+  };
+}
 
-  const nextHTML = risk.next
-    ? `<p class="next-impact"><strong>Next impact at ${risk.next.stage} ft</strong> (${gap.toFixed(1)} ft higher): ${clean(risk.next.statement)}</p>`
-    : "";
-
-  const noImpactsHTML = gauge.impacts.length === 0
-    ? `<p class="no-impacts">NWS has not published street-level impacts for this gauge.</p>`
-    : "";
-
-  const trendHTML = rate ? `<p class="trend-line">${trendLine(rate)}${fast ? ' <span class="fast">Rising fast</span>' : ""}</p>` : "";
-
-  const etaHTML = hours === null
-    ? ""
-    : `<p class="eta">If it keeps rising at this rate, the water could reach ${risk.next.stage} ft in ${etaText(hours)}. This is a rough estimate, not a forecast: rivers can slow down, level off or rise faster. For official forecasts see the National Weather Service.</p>`;
-
-  let updatedHTML = "";
-  if (simulated === null) {
-    const old = (new Date() - latest.time) > 2 * 3600000; // older than 2 hours
-    updatedHTML = `<p class="updated">${old ? "Old reading, from" : "Updated"} ${clock(latest.time)}</p>`;
+async function fetchUsgs() {
+  const siteList = currentGauges.map(g => g.usgsId).join(",");
+  const url = `https://waterservices.usgs.gov/nwis/iv/?sites=${siteList}&parameterCd=00065&period=PT6H&siteStatus=all&format=json`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`USGS returned status ${response.status}`);
   }
+  return response.json();
+}
 
-  const linkHTML = gauge.verified
-    ? `<a class="details" href="gauge.html?id=${gauge.usgsId}">7-day history</a>`
-    : `<a class="details" href="https://water.noaa.gov/gauges/${gauge.nwsId}" target="_blank" rel="noopener">View on NWS</a>`;
+// Turn USGS data into results and put them on the page.
+function showResults(data, demoTier) {
+  const results = currentGauges.map(gauge => {
+    const entry = data.value.timeSeries.find(e => e.sourceInfo.siteCode[0].value === gauge.usgsId);
+    return buildResult(gauge, entry, demoTier);
+  });
+  shownResults = results;
+  renderApp(results);
+  updateRoads(results, riverMode);
+  renderRoadsTile();
+  return results;
+}
 
-  return { id: gauge.usgsId, name, place: placeOf(name), height, tier: risk.tier, fast, html: `
-    <div class="gauge-card tier-${risk.tier.toLowerCase()}">
-      <h2>${clean(name)}</h2>
-      <span class="badge">${risk.tier}</span>
-      ${simulated !== null ? '<p class="demo-flag">SIMULATED DATA (demo mode)</p>' : ""}
-      ${distanceHTML}
-      <p class="height">${height} ft</p>
-      ${trendHTML}
-      ${etaHTML}
-      ${affectedHTML}
-      ${nextHTML}
-      ${noImpactsHTML}
-      ${updatedHTML}
-      ${sourceHTML}
-      ${linkHTML}
-    </div>
-  ` };
+// USGS or the connection failed and nothing is on screen: show the last good readings, clearly labeled.
+function showCachedCopy() {
+  const saved = loadCache();
+  if (!saved) {
+    return;
+  }
+  showResults(saved.data, null);
+  document.body.classList.add("stale");
+  document.getElementById("status").textContent =
+    `USGS could not be reached. Showing readings saved at ${clock(new Date(saved.savedAt))}, which may be out of date.`;
 }
 
 async function getGaugeData() {
@@ -181,32 +166,19 @@ async function getGaugeData() {
   const demoTier = new URLSearchParams(window.location.search).get("demo");
 
   try {
-    const siteList = currentGauges.map(g => g.usgsId).join(",");
-    const url = `https://waterservices.usgs.gov/nwis/iv/?sites=${siteList}&parameterCd=00065&period=PT6H&siteStatus=all&format=json`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`USGS returned status ${response.status}`);
-    }
-    const data = await response.json();
-
-    const results = currentGauges.map(gauge => {
-      const entry = data.value.timeSeries.find(e => e.sourceInfo.siteCode[0].value === gauge.usgsId);
-      return buildCard(gauge, entry, demoTier);
-    });
-
-    document.getElementById("gauge-cards").innerHTML = results.map(r => r.html).join("");
-
-    updateRoads(results, riverMode);
+    const data = await fetchUsgs();
+    const results = showResults(data, demoTier);
     checkAlerts(results, demoTier, riverMode);
     if (!demoTier && riverMode) {
-      saveCache(); // never save demo screens as if they were real readings
+      saveCache(data); // never save demo screens as if they were real readings
     }
+    document.body.classList.remove("stale");
     statusEl.textContent = "";
   } catch (error) {
     console.error("Failed to load gauge data:", error);
     statusEl.textContent = "Couldn't update from USGS just now. Will retry automatically.";
-    if (riverMode) {
-      showCachedIfEmpty();
+    if (riverMode && shownResults.length === 0) {
+      showCachedCopy();
     }
   }
 }

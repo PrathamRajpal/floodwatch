@@ -168,6 +168,10 @@ function renderNotifyControl() {
     button.hidden = true;
     note.textContent = "";
   }
+  const box = document.getElementById("notify-box");
+  if (box) {
+    box.hidden = note.textContent === "";
+  }
 }
 
 function checkAlerts(results, demoTier, riverMode) {
@@ -201,34 +205,31 @@ function checkAlerts(results, demoTier, riverMode) {
   renderNotifyControl();
 }
 
-// A copy of the last good screen, for when USGS or the connection fails.
-function saveCache() {
+// A copy of the last good USGS readings, for when USGS or the connection fails.
+function saveCache(data) {
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({
-      savedAt: new Date().toISOString(),
-      cards: document.getElementById("gauge-cards").innerHTML
-    }));
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt: new Date().toISOString(), data }));
   } catch (error) {
     // Storage can be blocked. The page still works.
   }
 }
 
-function showCachedIfEmpty() {
-  const box = document.getElementById("gauge-cards");
-  if (box.innerHTML.trim() !== "") {
-    return;
-  }
+function loadCache() {
   try {
     const saved = JSON.parse(localStorage.getItem(CACHE_KEY));
-    if (!saved) {
-      return;
-    }
-    box.innerHTML = saved.cards;
-    document.getElementById("status").textContent =
-      `USGS could not be reached. Showing readings saved at ${clock(new Date(saved.savedAt))}, which may be out of date.`;
+    // Older saved copies held card HTML instead of readings. Those cannot be used any more.
+    return saved && saved.data && saved.data.value ? saved : null;
   } catch (error) {
-    // Nothing usable was saved.
+    return null;
   }
+}
+
+// Used when demo mode is switched on or off, so made-up readings are never compared with real ones.
+function resetAlertState() {
+  previous = null;
+  sessionChanges = [];
+  panelDismissed = false;
+  firstCheck = true;
 }
 
 document.getElementById("alert-panel").addEventListener("click", event => {
